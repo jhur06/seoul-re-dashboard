@@ -70,8 +70,9 @@
   </div>
 </div>
 
-<div class="tabs">
+<div class="tabs" id="tabBar">
   <button class="tab active" onclick="showTab('overview')">종합 현황</button>
+  <button class="tab" onclick="showTab('weekly')">주간 동향</button>
   <button class="tab" onclick="showTab('foreigner')">외국인 동향</button>
   <button class="tab" onclick="showTab('nationality')">국적별 현황</button>
   <button class="tab" onclick="showTab('price')">매매가 추이</button>
@@ -89,6 +90,28 @@
     <div class="card-title">월별 거래 건수</div>
     <div class="card-sub">지역별 아파트 매매 건수</div>
     <div class="chart-wrap"><canvas id="chartVolume"></canvas></div>
+  </div>
+</div>
+
+<!-- 주간 동향 (NEW) -->
+<div class="section" id="sec-weekly">
+  <div class="card">
+    <div class="card-title">주간 아파트 매매가격지수 변동률</div>
+    <div class="card-sub">KB부동산 주간 동향 (최근 25주)</div>
+    <div class="chart-wrap"><canvas id="chartWeeklyIdx"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="card-title">주간 전세가격지수 변동률</div>
+    <div class="card-sub">KB부동산 주간 동향 (최근 25주)</div>
+    <div class="chart-wrap"><canvas id="chartWeeklyJeonse"></canvas></div>
+  </div>
+  <div class="card">
+    <div class="card-title">주간 거래 건수 추이</div>
+    <div class="card-sub">서대문구 / 강남구 / 용산구 (최근 25주)</div>
+    <div class="chart-wrap"><canvas id="chartWeeklyVol"></canvas></div>
+  </div>
+  <div class="info">
+    주간 데이터는 KB부동산과 한국부동산원의 주간 아파트 가격동향조사 기반입니다. 매주 목요일 공표되며, PublicDataReader를 통해 API 키 없이 수집합니다.
   </div>
 </div>
 
@@ -125,7 +148,7 @@
     </table>
   </div>
   <div class="info">
-    미국 국적 보유자의 상당수(55%+)는 재외동포(Korean-American)입니다. 장기체류 외국인 대비 주택소유 비율은 미국(27.0%), 캐나다(24.1%), 호주(21.9%) 순입니다. IROS 등기기록에서 외국인 소유자 국적별 현황을 지역별(시군구)로 확인할 수 있습니다.
+    미국 국적 보유자의 상당수(55%+)는 재외동포(Korean-American)입니다. 장기체류 외국인 대비 주택소유 비율은 미국(27.0%), 캐나다(24.1%), 호주(21.9%) 순입니다.
   </div>
 </div>
 
@@ -154,7 +177,7 @@
         <tr><td>국토교통부 실거래가 API</td><td>아파트/연립/단독/오피스텔 매매 및 전월세</td><td>일별 누적</td></tr>
         <tr><td>등기정보광장 Open API</td><td>소유권이전, 외국인/내국인, 국적별 현황</td><td>월별</td></tr>
         <tr><td>한국부동산원 통계 API</td><td>주택가격지수, 전세가율</td><td>주간</td></tr>
-        <tr><td>KB부동산 (PublicDataReader)</td><td>KB시세, 매매/전세 가격지수</td><td>주간</td></tr>
+        <tr><td>KB부동산 (PublicDataReader)</td><td>KB시세, 매매/전세 가격지수, 주간변동률</td><td>주간</td></tr>
         <tr><td>KOSIS 국가통계포털</td><td>외국인 주택/토지 소유 국적별 (반기)</td><td>반기</td></tr>
       </tbody>
     </table>
@@ -169,157 +192,172 @@
 </div>
 
 <script>
-const COLORS = {yeonhui:'#534AB7',gangnam:'#D85A30',hannam:'#1D9E75',foreign:'#D85A30',overseas:'#1D9E75',domestic:'#534AB7'};
+const C = {yeonhui:'#534AB7',gangnam:'#D85A30',hannam:'#1D9E75',foreign:'#D85A30',overseas:'#1D9E75',blue:'#378ADD',amber:'#BA7517',pink:'#D4537E'};
 
-// Generate simulated data (replaced by real data when data/*.json exists)
-function genTrend(base,vol,drift,n){const a=[base];for(let i=1;i<n;i++)a.push(Math.round(a[i-1]+drift+(Math.random()-.5)*vol));return a;}
+function gen(b,v,d,n){const a=[b];for(let i=1;i<n;i++)a.push(Math.round(a[i-1]+d+(Math.random()-.5)*v));return a;}
 
-const months = [];
-for(let y=2024;y<=2026;y++)for(let m=1;m<=12;m++){
-  if(y===2024&&m<7)continue;if(y===2026&&m>3)break;
-  months.push(`${y}-${String(m).padStart(2,'0')}`);
-}
-const labels = months.map(m=>m.slice(2));
+// Monthly labels (21 months)
+const months=[];
+for(let y=2024;y<=2026;y++)for(let m=1;m<=12;m++){if(y===2024&&m<7)continue;if(y===2026&&m>3)break;months.push(`${y}-${String(m).padStart(2,'0')}`);}
+const mLabels=months.map(m=>m.slice(2));
 
-const simData = {
-  yeonhui: genTrend(62000,4000,800,months.length),
-  gangnam: genTrend(210000,12000,2500,months.length),
-  hannam: genTrend(185000,10000,1800,months.length),
-  yeonhuiJeonse: genTrend(32000,2000,300,months.length),
-  gangnamJeonse: genTrend(120000,8000,1000,months.length),
-  hannamJeonse: genTrend(95000,6000,600,months.length),
-  volYeonhui: genTrend(15,8,0,months.length),
-  volGangnam: genTrend(280,60,5,months.length),
-  volHannam: genTrend(45,20,2,months.length),
-  foreignCount: genTrend(120,30,5,months.length).map(v=>Math.max(v,50)),
-  domesticCount: genTrend(2800,400,50,months.length).map(v=>Math.max(v,1500)),
-  overseasCount: genTrend(45,15,2,months.length).map(v=>Math.max(v,15)),
+// Weekly labels (25 weeks)
+const wLabels=[];
+const now=new Date(2026,3,2);
+for(let i=24;i>=0;i--){const d=new Date(now);d.setDate(d.getDate()-i*7);wLabels.push(`${d.getMonth()+1}/${d.getDate()}`);}
+
+// Monthly simulated data
+const sim={
+  yeonhui:gen(62000,4000,800,21),gangnam:gen(210000,12000,2500,21),hannam:gen(185000,10000,1800,21),
+  yeonhuiJ:gen(32000,2000,300,21),gangnamJ:gen(120000,8000,1000,21),hannamJ:gen(95000,6000,600,21),
+  volY:gen(15,8,0,21),volG:gen(280,60,5,21),volH:gen(45,20,2,21),
+  fgn:gen(120,30,5,21).map(v=>Math.max(v,50)),
+  dom:gen(2800,400,50,21).map(v=>Math.max(v,1500)),
+  ovs:gen(45,15,2,21).map(v=>Math.max(v,15)),
 };
 
-const natData = [
-  {name:'중국',count:58896,pct:56.6,color:'#D85A30'},
-  {name:'미국',count:22455,pct:21.6,color:'#534AB7'},
-  {name:'캐나다',count:6433,pct:6.2,color:'#1D9E75'},
-  {name:'대만',count:3400,pct:3.3,color:'#378ADD'},
-  {name:'호주',count:2000,pct:1.9,color:'#BA7517'},
-  {name:'베트남',count:1800,pct:1.7,color:'#D4537E'},
+// Weekly simulated data
+const wSim={
+  seoulSaleChg:Array.from({length:25},()=>+(Math.random()*0.6-0.15).toFixed(2)),
+  sdmSaleChg:Array.from({length:25},()=>+(Math.random()*0.8-0.2).toFixed(2)),
+  gnSaleChg:Array.from({length:25},()=>+(Math.random()*0.7-0.1).toFixed(2)),
+  ysSaleChg:Array.from({length:25},()=>+(Math.random()*0.9-0.25).toFixed(2)),
+  seoulJeonseChg:Array.from({length:25},()=>+(Math.random()*0.5-0.2).toFixed(2)),
+  sdmJeonseChg:Array.from({length:25},()=>+(Math.random()*0.6-0.25).toFixed(2)),
+  gnJeonseChg:Array.from({length:25},()=>+(Math.random()*0.5-0.15).toFixed(2)),
+  ysJeonseChg:Array.from({length:25},()=>+(Math.random()*0.7-0.3).toFixed(2)),
+  volY:Array.from({length:25},()=>Math.round(Math.random()*8+2)),
+  volG:Array.from({length:25},()=>Math.round(Math.random()*80+40)),
+  volH:Array.from({length:25},()=>Math.round(Math.random()*25+5)),
+};
+
+const natData=[
+  {name:'중국',count:58896,pct:56.6,color:C.gangnam},
+  {name:'미국',count:22455,pct:21.6,color:C.yeonhui},
+  {name:'캐나다',count:6433,pct:6.2,color:C.hannam},
+  {name:'대만',count:3400,pct:3.3,color:C.blue},
+  {name:'호주',count:2000,pct:1.9,color:C.amber},
+  {name:'베트남',count:1800,pct:1.7,color:C.pink},
   {name:'일본',count:1600,pct:1.5,color:'#639922'},
   {name:'기타',count:7481,pct:7.2,color:'#888780'},
 ];
 
-// Try loading real data, fall back to simulated
+// Load real data or show sim notice
 async function loadData(){
-  try{
-    const resp = await fetch('data/meta.json');
-    if(resp.ok){
-      const meta = await resp.json();
-      document.getElementById('lastUpdate').textContent = new Date(meta.last_update).toLocaleString('ko-KR');
-      return;
-    }
-  }catch(e){}
-  document.getElementById('lastUpdate').textContent = '시뮬레이션 데이터 (파이프라인 데이터 대기 중)';
+  try{const r=await fetch('data/meta.json');if(r.ok){const m=await r.json();document.getElementById('lastUpdate').textContent=new Date(m.last_update).toLocaleString('ko-KR');return;}}catch(e){}
+  document.getElementById('lastUpdate').textContent='시뮬레이션 데이터 (파이프라인 데이터 대기 중)';
 }
 
 // Stat cards
-const last = simData.yeonhui.length-1;
-document.getElementById('s1').textContent = (simData.yeonhui[last]/10000).toFixed(1)+'억';
-document.getElementById('s2').textContent = (simData.gangnam[last]/10000).toFixed(1)+'억';
-document.getElementById('s3').textContent = (simData.hannam[last]/10000).toFixed(1)+'억';
-const totalBuyers = simData.domesticCount[last]+simData.foreignCount[last]+simData.overseasCount[last];
-document.getElementById('s4').textContent = ((simData.foreignCount[last]+simData.overseasCount[last])/totalBuyers*100).toFixed(1)+'%';
+const L=sim.yeonhui.length-1;
+document.getElementById('s1').textContent=(sim.yeonhui[L]/10000).toFixed(1)+'억';
+document.getElementById('s2').textContent=(sim.gangnam[L]/10000).toFixed(1)+'억';
+document.getElementById('s3').textContent=(sim.hannam[L]/10000).toFixed(1)+'억';
+const tot=sim.dom[L]+sim.fgn[L]+sim.ovs[L];
+document.getElementById('s4').textContent=((sim.fgn[L]+sim.ovs[L])/tot*100).toFixed(1)+'%';
 
-// Chart defaults
-Chart.defaults.font.family = "-apple-system,'Pretendard',sans-serif";
-Chart.defaults.font.size = 11;
-Chart.defaults.plugins.legend.labels.boxWidth = 12;
-Chart.defaults.plugins.legend.labels.padding = 14;
-const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--border').trim()||'#e8e6e1';
+// Chart config
+Chart.defaults.font.family="-apple-system,'Pretendard',sans-serif";
+Chart.defaults.font.size=11;
+Chart.defaults.plugins.legend.labels.boxWidth=12;
+Chart.defaults.plugins.legend.labels.padding=14;
+const gColor='rgba(200,198,190,0.25)';
 
-function makeChart(id,type,labels,datasets,opts={}){
-  return new Chart(document.getElementById(id),{
-    type,data:{labels,datasets},
-    options:{
-      responsive:true,maintainAspectRatio:false,
-      scales:{
-        x:{grid:{display:false},ticks:{maxTicksLimit:10}},
-        y:{grid:{color:gridColor+'44'},ticks:{callback:v=>opts.yFormat?opts.yFormat(v):v},...(opts.yOpts||{})}
-      },
-      plugins:{tooltip:{callbacks:{label:ctx=>{const v=ctx.parsed.y;return ctx.dataset.label+': '+(opts.tipFormat?opts.tipFormat(v):v.toLocaleString())}}},legend:{position:'top'}},
-      ...opts.chartOpts
-    }
-  });
+// Common line point style: small dots, bigger on hover
+const dot={pointRadius:3,pointHoverRadius:6,pointBackgroundColor:'#fff',pointBorderWidth:2,pointHoverBorderWidth:2.5};
+
+function mkLine(id,labels,datasets,opts={}){
+  datasets.forEach(ds=>{Object.assign(ds,dot);ds.pointBorderColor=ds.borderColor;ds.tension=0.3;});
+  return new Chart(document.getElementById(id),{type:'line',data:{labels,datasets},options:{
+    responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+    scales:{x:{grid:{display:false},ticks:{maxTicksLimit:opts.maxTicks||10}},y:{grid:{color:gColor},ticks:{callback:v=>opts.yFmt?opts.yFmt(v):v},...(opts.yOpts||{})}},
+    plugins:{tooltip:{callbacks:{label:ctx=>{const v=ctx.parsed.y;return ctx.dataset.label+': '+(opts.tipFmt?opts.tipFmt(v):v.toLocaleString())}}},legend:{position:'top'}}
+  }});
+}
+function mkBar(id,labels,datasets,opts={}){
+  return new Chart(document.getElementById(id),{type:'bar',data:{labels,datasets},options:{
+    responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+    scales:{x:{grid:{display:false},ticks:{maxTicksLimit:opts.maxTicks||10}},y:{grid:{color:gColor},ticks:{callback:v=>opts.yFmt?opts.yFmt(v):v}}},
+    plugins:{tooltip:{callbacks:{label:ctx=>ctx.dataset.label+': '+(opts.tipFmt?opts.tipFmt(ctx.parsed.y):ctx.parsed.y.toLocaleString())}},legend:{position:'top'}}
+  }});
 }
 
-const fmtMan = v=>(v/10000).toFixed(0)+'억';
-const fmtManTip = v=>v.toLocaleString()+'만원';
+const fmtAk=v=>(v/10000).toFixed(0)+'억';
+const fmtManTip=v=>v.toLocaleString()+'만원';
 
-// Overview charts
-makeChart('chartPrice','line',labels,[
-  {label:'연희동',data:simData.yeonhui,borderColor:COLORS.yeonhui,borderWidth:2.5,pointRadius:0,tension:.3},
-  {label:'강남구',data:simData.gangnam,borderColor:COLORS.gangnam,borderWidth:2,pointRadius:0,tension:.3},
-  {label:'한남동',data:simData.hannam,borderColor:COLORS.hannam,borderWidth:2,pointRadius:0,tension:.3},
-],{yFormat:fmtMan,tipFormat:fmtManTip});
+// === 종합 현황 ===
+mkLine('chartPrice',mLabels,[
+  {label:'연희동',data:sim.yeonhui,borderColor:C.yeonhui,borderWidth:2.5},
+  {label:'강남구',data:sim.gangnam,borderColor:C.gangnam,borderWidth:2},
+  {label:'한남동',data:sim.hannam,borderColor:C.hannam,borderWidth:2},
+],{yFmt:fmtAk,tipFmt:fmtManTip});
 
-makeChart('chartVolume','bar',labels,[
-  {label:'강남구',data:simData.volGangnam,backgroundColor:COLORS.gangnam+'cc',borderRadius:3},
-  {label:'한남동',data:simData.volHannam,backgroundColor:COLORS.hannam+'cc',borderRadius:3},
-  {label:'연희동',data:simData.volYeonhui,backgroundColor:COLORS.yeonhui+'cc',borderRadius:3},
-],{tipFormat:v=>v+'건'});
+mkBar('chartVolume',mLabels,[
+  {label:'강남구',data:sim.volG,backgroundColor:C.gangnam+'cc',borderRadius:3},
+  {label:'한남동',data:sim.volH,backgroundColor:C.hannam+'cc',borderRadius:3},
+  {label:'연희동',data:sim.volY,backgroundColor:C.yeonhui+'cc',borderRadius:3},
+],{tipFmt:v=>v+'건'});
 
-// Foreigner charts
-makeChart('chartForeigner','bar',labels,[
-  {label:'외국인',data:simData.foreignCount,backgroundColor:COLORS.foreign+'cc',borderRadius:3},
-  {label:'재외동포',data:simData.overseasCount,backgroundColor:COLORS.overseas+'cc',borderRadius:3},
-],{tipFormat:v=>v+'건'});
+// === 주간 동향 ===
+mkLine('chartWeeklyIdx',wLabels,[
+  {label:'서울 전체',data:wSim.seoulSaleChg,borderColor:'#888780',borderWidth:1.5,borderDash:[4,3]},
+  {label:'서대문구',data:wSim.sdmSaleChg,borderColor:C.yeonhui,borderWidth:2.5},
+  {label:'강남구',data:wSim.gnSaleChg,borderColor:C.gangnam,borderWidth:2},
+  {label:'용산구',data:wSim.ysSaleChg,borderColor:C.hannam,borderWidth:2},
+],{yFmt:v=>v+'%',tipFmt:v=>v+'%',maxTicks:13,yOpts:{suggestedMin:-0.5,suggestedMax:0.8}});
 
-const foreignPct = months.map((_,i)=>{
-  const t=simData.domesticCount[i]+simData.foreignCount[i]+simData.overseasCount[i];
-  return+((simData.foreignCount[i]+simData.overseasCount[i])/t*100).toFixed(1);
-});
-makeChart('chartForeignerPct','line',labels,[
-  {label:'외국인+재외동포 비율',data:foreignPct,borderColor:COLORS.foreign,backgroundColor:COLORS.foreign+'18',fill:true,borderWidth:2,pointRadius:0,tension:.3},
-],{yFormat:v=>v+'%',tipFormat:v=>v+'%',yOpts:{min:0}});
+mkLine('chartWeeklyJeonse',wLabels,[
+  {label:'서울 전체',data:wSim.seoulJeonseChg,borderColor:'#888780',borderWidth:1.5,borderDash:[4,3]},
+  {label:'서대문구',data:wSim.sdmJeonseChg,borderColor:C.yeonhui,borderWidth:2.5},
+  {label:'강남구',data:wSim.gnJeonseChg,borderColor:C.gangnam,borderWidth:2},
+  {label:'용산구',data:wSim.ysJeonseChg,borderColor:C.hannam,borderWidth:2},
+],{yFmt:v=>v+'%',tipFmt:v=>v+'%',maxTicks:13,yOpts:{suggestedMin:-0.5,suggestedMax:0.7}});
 
-// Nationality chart
-makeChart('chartNationality','doughnut',natData.map(d=>d.name),[{
-  data:natData.map(d=>d.count),
-  backgroundColor:natData.map(d=>d.color),
-  borderWidth:0
-}],{chartOpts:{scales:{x:{display:false},y:{display:false}}}});
+mkBar('chartWeeklyVol',wLabels,[
+  {label:'강남구',data:wSim.volG,backgroundColor:C.gangnam+'cc',borderRadius:3},
+  {label:'용산구',data:wSim.volH,backgroundColor:C.hannam+'cc',borderRadius:3},
+  {label:'서대문구',data:wSim.volY,backgroundColor:C.yeonhui+'cc',borderRadius:3},
+],{tipFmt:v=>v+'건',maxTicks:13});
 
-// Nationality table
-const tbody = document.getElementById('natTableBody');
-const maxCount = natData[0].count;
-natData.forEach(d=>{
-  const tr = document.createElement('tr');
-  tr.innerHTML = `<td>${d.name}</td><td>${d.count.toLocaleString()}가구</td><td><div class="bar-bg"><div class="bar-fill" style="width:${d.count/maxCount*100}%;background:${d.color}"></div></div></td><td>${d.pct}%</td>`;
-  tbody.appendChild(tr);
-});
+// === 외국인 동향 ===
+mkBar('chartForeigner',mLabels,[
+  {label:'외국인',data:sim.fgn,backgroundColor:C.foreign+'cc',borderRadius:3},
+  {label:'재외동포',data:sim.ovs,backgroundColor:C.overseas+'cc',borderRadius:3},
+],{tipFmt:v=>v+'건'});
 
-// Price by type
-const aptData = genTrend(180000,10000,2000,months.length);
-const villaData = genTrend(45000,3000,500,months.length);
-const houseData = genTrend(85000,6000,800,months.length);
-const offiData = genTrend(38000,2500,400,months.length);
-makeChart('chartByType','line',labels,[
-  {label:'아파트',data:aptData,borderColor:COLORS.yeonhui,borderWidth:2,pointRadius:0,tension:.3},
-  {label:'단독다가구',data:houseData,borderColor:COLORS.coral,borderWidth:1.5,pointRadius:0,tension:.3},
-  {label:'연립다세대',data:villaData,borderColor:COLORS.hannam,borderWidth:1.5,pointRadius:0,tension:.3},
-  {label:'오피스텔',data:offiData,borderColor:COLORS.amber,borderWidth:1.5,pointRadius:0,tension:.3,borderDash:[4,3]},
-],{yFormat:fmtMan,tipFormat:fmtManTip});
+const fPct=months.map((_,i)=>{const t=sim.dom[i]+sim.fgn[i]+sim.ovs[i];return+((sim.fgn[i]+sim.ovs[i])/t*100).toFixed(1);});
+mkLine('chartForeignerPct',mLabels,[
+  {label:'외국인+재외동포 비율',data:fPct,borderColor:C.foreign,backgroundColor:C.foreign+'18',fill:true,borderWidth:2},
+],{yFmt:v=>v+'%',tipFmt:v=>v+'%',yOpts:{min:0}});
 
-makeChart('chartJeonse','line',labels,[
-  {label:'연희동',data:simData.yeonhuiJeonse,borderColor:COLORS.yeonhui,borderWidth:2.5,pointRadius:0,tension:.3},
-  {label:'강남구',data:simData.gangnamJeonse,borderColor:COLORS.gangnam,borderWidth:2,pointRadius:0,tension:.3},
-  {label:'한남동',data:simData.hannamJeonse,borderColor:COLORS.hannam,borderWidth:2,pointRadius:0,tension:.3},
-],{yFormat:fmtMan,tipFormat:fmtManTip});
+// === 국적별 ===
+new Chart(document.getElementById('chartNationality'),{type:'doughnut',data:{labels:natData.map(d=>d.name),datasets:[{data:natData.map(d=>d.count),backgroundColor:natData.map(d=>d.color),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{tooltip:{callbacks:{label:ctx=>ctx.label+': '+ctx.parsed.toLocaleString()+'가구'}}}}});
+
+const tbody=document.getElementById('natTableBody');
+natData.forEach(d=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${d.name}</td><td>${d.count.toLocaleString()}가구</td><td><div class="bar-bg"><div class="bar-fill" style="width:${d.count/natData[0].count*100}%;background:${d.color}"></div></div></td><td>${d.pct}%</td>`;tbody.appendChild(tr);});
+
+// === 매매가 추이 ===
+mkLine('chartByType',mLabels,[
+  {label:'아파트',data:gen(180000,10000,2000,21),borderColor:C.yeonhui,borderWidth:2},
+  {label:'단독다가구',data:gen(85000,6000,800,21),borderColor:C.gangnam,borderWidth:1.5},
+  {label:'연립다세대',data:gen(45000,3000,500,21),borderColor:C.hannam,borderWidth:1.5},
+  {label:'오피스텔',data:gen(38000,2500,400,21),borderColor:C.amber,borderWidth:1.5,borderDash:[4,3]},
+],{yFmt:fmtAk,tipFmt:fmtManTip});
+
+mkLine('chartJeonse',mLabels,[
+  {label:'연희동',data:sim.yeonhuiJ,borderColor:C.yeonhui,borderWidth:2.5},
+  {label:'강남구',data:sim.gangnamJ,borderColor:C.gangnam,borderWidth:2},
+  {label:'한남동',data:sim.hannamJ,borderColor:C.hannam,borderWidth:2},
+],{yFmt:fmtAk,tipFmt:fmtManTip});
 
 // Tab switching
 function showTab(id){
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('sec-'+id).classList.add('active');
-  event.target.classList.add('active');
+  const tabs=document.querySelectorAll('.tab');
+  const tabIds=['overview','weekly','foreigner','nationality','price','sources'];
+  tabs[tabIds.indexOf(id)].classList.add('active');
 }
 
 loadData();
