@@ -6,42 +6,34 @@
 <title>서울 부동산 거래 동향</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <style>
-  :root{--bg:#faf9f6;--card:#fff;--border:#e8e6e1;--text:#1a1a18;--muted:#6b6a66;--hint:#9c9a92;--accent:#534AB7;--green:#1D9E75;--coral:#D85A30;--blue:#378ADD;--pink:#D4537E;--amber:#BA7517}
+  :root{--bg:#faf9f6;--card:#fff;--border:#e8e6e1;--text:#1a1a18;--muted:#6b6a66;--hint:#9c9a92;--green:#1D9E75;--coral:#D85A30;--blue:#378ADD;--pink:#D4537E;--amber:#BA7517;--purple:#534AB7}
   @media(prefers-color-scheme:dark){:root{--bg:#1a1a18;--card:#2c2c2a;--border:#444441;--text:#e8e6e1;--muted:#b4b2a9;--hint:#888780}}
   *{margin:0;padding:0;box-sizing:border-box}
   body{font-family:-apple-system,'Pretendard','Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);line-height:1.6;padding:20px;max-width:900px;margin:0 auto}
-  .header{margin-bottom:24px}
-  .header h1{font-size:22px;font-weight:600;margin-bottom:4px}
-  .header p{font-size:13px;color:var(--muted)}
+  .header{margin-bottom:24px}.header h1{font-size:22px;font-weight:600;margin-bottom:4px}.header p{font-size:13px;color:var(--muted)}
   .badge{display:inline-block;font-size:10px;padding:2px 8px;border-radius:5px;background:rgba(29,158,117,.12);color:var(--green);font-weight:600;margin-left:6px;vertical-align:middle}
   .stats{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px}
   .stat{flex:1 1 180px;min-width:160px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px}
-  .stat-label{font-size:11px;color:var(--hint);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
-  .stat-value{font-size:26px;font-weight:600}
-  .stat-sub{font-size:12px;color:var(--muted);margin-top:4px}
+  .stat-label{font-size:11px;color:var(--hint);letter-spacing:.04em;margin-bottom:4px}.stat-value{font-size:26px;font-weight:600}.stat-sub{font-size:12px;color:var(--muted);margin-top:4px}
   .tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:20px;overflow-x:auto}
   .tab{padding:8px 14px;font-size:13px;border:none;background:none;color:var(--hint);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap}
   .tab.active{color:var(--text);font-weight:600;border-bottom-color:var(--text)}
   .card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:18px;margin-bottom:16px}
-  .card-title{font-size:14px;font-weight:600;margin-bottom:2px}
-  .card-sub{font-size:11px;color:var(--hint);margin-bottom:14px}
+  .card-title{font-size:14px;font-weight:600;margin-bottom:2px}.card-sub{font-size:11px;color:var(--hint);margin-bottom:14px}
   .chart-wrap{position:relative;height:280px}
-  .section{display:none}
-  .section.active{display:block}
+  .section{display:none}.section.active{display:block}
   .info{background:rgba(55,138,221,.06);border:1px solid rgba(55,138,221,.15);border-radius:8px;padding:12px 14px;font-size:12px;color:var(--muted);line-height:1.7;margin-top:12px}
   .nat-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:10px}
   .nat-table th{text-align:left;padding:8px;border-bottom:2px solid var(--border);font-weight:600;font-size:12px;color:var(--hint)}
-  .nat-table td{padding:8px;border-bottom:1px solid var(--border)}
-  .nat-table td:last-child{text-align:right;font-weight:600}
-  .bar-bg{height:8px;background:var(--border);border-radius:4px;overflow:hidden;min-width:100px}
-  .bar-fill{height:100%;border-radius:4px}
+  .nat-table td{padding:8px;border-bottom:1px solid var(--border)}.nat-table td:last-child{text-align:right;font-weight:600}
+  .bar-bg{height:8px;background:var(--border);border-radius:4px;overflow:hidden;min-width:100px}.bar-fill{height:100%;border-radius:4px}
   .iros-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0}
   .iros-item{background:var(--bg);border-radius:8px;padding:10px 12px;font-size:12px}
-  .iros-item b{display:block;font-size:13px;margin-bottom:3px;color:var(--text)}
-  .iros-item span{color:var(--hint);font-size:11px}
+  .iros-item b{display:block;font-size:13px;margin-bottom:3px;color:var(--text)}.iros-item span{color:var(--hint);font-size:11px}
   @media(max-width:700px){.iros-grid{grid-template-columns:1fr}}
   .footer{text-align:center;font-size:11px;color:var(--hint);margin-top:32px;padding-top:16px;border-top:1px solid var(--border)}
   @media(max-width:600px){body{padding:12px}.stats{gap:8px}.stat{padding:12px}.chart-wrap{height:220px}}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:16px}@media(max-width:600px){.two-col{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -53,10 +45,10 @@
 </div>
 
 <div class="stats">
-  <div class="stat"><div class="stat-label">연희동 평균 매매가</div><div class="stat-value" id="s1">-</div><div class="stat-sub">아파트 기준 (만원)</div></div>
-  <div class="stat"><div class="stat-label">강남구 평균 매매가</div><div class="stat-value" id="s2">-</div><div class="stat-sub">아파트 기준 (만원)</div></div>
-  <div class="stat"><div class="stat-label">한남동 평균 매매가</div><div class="stat-value" id="s3">-</div><div class="stat-sub">아파트 기준 (만원)</div></div>
-  <div class="stat"><div class="stat-label">외국인 거래 비율</div><div class="stat-value" id="s4">-</div><div class="stat-sub">서울 전체 소유권이전 대비</div></div>
+  <div class="stat"><div class="stat-label">연희동 평균 매매가</div><div class="stat-value" id="s1">-</div><div class="stat-sub">아파트 기준</div></div>
+  <div class="stat"><div class="stat-label">강남구 평균 매매가</div><div class="stat-value" id="s2">-</div><div class="stat-sub">아파트 기준</div></div>
+  <div class="stat"><div class="stat-label">한남동 평균 매매가</div><div class="stat-value" id="s3">-</div><div class="stat-sub">아파트 기준</div></div>
+  <div class="stat"><div class="stat-label">외국인 거래 비율</div><div class="stat-value" id="s4">-</div><div class="stat-sub">서울 소유권이전 대비</div></div>
 </div>
 
 <div class="tabs" id="tabBar">
@@ -68,257 +60,195 @@
   <button class="tab" onclick="showTab('sources')">데이터 출처</button>
 </div>
 
-<!-- 종합 현황 -->
 <div class="section active" id="sec-overview">
-  <div class="card"><div class="card-title">지역별 아파트 매매가 추이</div><div class="card-sub">국토교통부 실거래가 (만원)</div><div class="chart-wrap"><canvas id="chartPrice"></canvas></div></div>
-  <div class="card"><div class="card-title">월별 거래 건수</div><div class="card-sub">지역별 아파트 매매 건수</div><div class="chart-wrap"><canvas id="chartVolume"></canvas></div></div>
+  <div class="card"><div class="card-title">지역별 아파트 매매가 추이</div><div class="card-sub">국토교통부 실거래가 (만원)</div><div class="chart-wrap"><canvas id="c_ov_price"></canvas></div></div>
+  <div class="card"><div class="card-title">월별 거래 건수</div><div class="card-sub">지역별 아파트 매매 건수</div><div class="chart-wrap"><canvas id="c_ov_vol"></canvas></div></div>
 </div>
 
-<!-- 주간 동향 -->
+<!-- 주간 동향: 실제 가격 중심 -->
 <div class="section" id="sec-weekly">
-  <div class="card">
-    <div class="card-title">아파트 매매가격 주간 변동률 (구별)</div>
-    <div class="card-sub">KB부동산 주간 동향 · 최근 25주</div>
-    <div class="chart-wrap"><canvas id="chartWkAptDist"></canvas></div>
-  </div>
-  <div class="card">
-    <div class="card-title">부동산 유형별 매매가격 주간 변동률</div>
-    <div class="card-sub">서울 전체 · 아파트 / 연립다세대 / 단독주택 · 최근 25주</div>
-    <div class="chart-wrap"><canvas id="chartWkByType"></canvas></div>
-  </div>
-  <div class="card">
-    <div class="card-title">전세가격 주간 변동률 (구별)</div>
-    <div class="card-sub">KB부동산 주간 동향 · 최근 25주</div>
-    <div class="chart-wrap"><canvas id="chartWkJeonse"></canvas></div>
-  </div>
-  <div class="card">
-    <div class="card-title">연립다세대 / 단독주택 전세 주간 변동률</div>
-    <div class="card-sub">서울 전체 · 최근 25주</div>
-    <div class="chart-wrap"><canvas id="chartWkJeonseType"></canvas></div>
-  </div>
-  <div class="card">
-    <div class="card-title">주간 거래 건수</div>
-    <div class="card-sub">서대문구 / 강남구 / 용산구 · 최근 25주</div>
-    <div class="chart-wrap"><canvas id="chartWkVol"></canvas></div>
-  </div>
-  <div class="info">
-    주간 가격 데이터는 KB부동산과 한국부동산원의 주간 가격동향조사 기반입니다. 매주 목요일 공표되며, PublicDataReader를 통해 API 키 없이 수집합니다. 외국인 매수인 신청현황(IROS)은 일별 조회가 가능하며, 매일 최근 7일치를 자동 수집합니다.
-  </div>
+  <div class="card"><div class="card-title">주간 아파트 매매가 (구별)</div><div class="card-sub">KB부동산 주간 시세 · 만원/3.3㎡ · 최근 25주</div><div class="chart-wrap"><canvas id="c_wk_apt"></canvas></div></div>
+  <div class="card"><div class="card-title">주간 연립다세대 매매가 (구별)</div><div class="card-sub">KB부동산 주간 시세 · 만원/3.3㎡ · 최근 25주</div><div class="chart-wrap"><canvas id="c_wk_villa"></canvas></div></div>
+  <div class="card"><div class="card-title">주간 단독주택 매매가 (구별)</div><div class="card-sub">KB부동산 주간 시세 · 만원 · 최근 25주</div><div class="chart-wrap"><canvas id="c_wk_house"></canvas></div></div>
+  <div class="card"><div class="card-title">주간 아파트 전세가 (구별)</div><div class="card-sub">KB부동산 주간 시세 · 만원/3.3㎡ · 최근 25주</div><div class="chart-wrap"><canvas id="c_wk_jeonse"></canvas></div></div>
+  <div class="card"><div class="card-title">주간 거래 건수</div><div class="card-sub">서대문구 / 강남구 / 용산구 · 최근 25주</div><div class="chart-wrap"><canvas id="c_wk_vol"></canvas></div></div>
+  <div class="info">주간 시세 데이터는 KB부동산의 주간 아파트/연립다세대/단독주택 가격 동향 기반입니다. 매주 목요일 공표됩니다.</div>
 </div>
 
-<!-- 외국인 동향 -->
+<!-- 외국인 동향: 확장 분석 -->
 <div class="section" id="sec-foreigner">
-  <div class="card"><div class="card-title">외국인/재외동포 매수 건수 추이</div><div class="card-sub">등기정보광장 소유권이전등기(매매) 매수인 현황 · 월별</div><div class="chart-wrap"><canvas id="chartForeigner"></canvas></div></div>
-  <div class="card"><div class="card-title">매수인 유형별 비율 추이</div><div class="card-sub">외국인 + 재외동포 비율 (%)</div><div class="chart-wrap"><canvas id="chartForeignerPct"></canvas></div></div>
+  <div class="card"><div class="card-title">외국인/재외동포 매수 건수 추이 (일별)</div><div class="card-sub">IROS 소유권이전등기(매매) 매수인 현황 · 최근 30일</div><div class="chart-wrap"><canvas id="c_fg_daily"></canvas></div></div>
+
+  <div class="two-col">
+    <div class="card"><div class="card-title">구별 외국인 매수 비율</div><div class="card-sub">이번 달 누적 · 매매 매수인 기준</div><div class="chart-wrap"><canvas id="c_fg_dist"></canvas></div></div>
+    <div class="card"><div class="card-title">외국인 국적별 매수 (최근)</div><div class="card-sub">매매 매수인 국적별 · 3개 구 합산</div><div class="chart-wrap"><canvas id="c_fg_nat"></canvas></div></div>
+  </div>
+
+  <div class="card"><div class="card-title">월별 외국인 매수 건수 추이</div><div class="card-sub">IROS 등기정보광장 · 서울 3개 구 합산</div><div class="chart-wrap"><canvas id="c_fg_monthly"></canvas></div></div>
+  <div class="card"><div class="card-title">외국인 매수 부동산 유형 비율</div><div class="card-sub">토지 / 일반건물 / 집합건물(아파트 등) · 서울 3개 구</div><div class="chart-wrap"><canvas id="c_fg_type"></canvas></div></div>
+  <div class="card"><div class="card-title">구별 외국인 부동산 소유 현황 (스냅샷)</div><div class="card-sub">IROS 등기기록 기준 현재 소유자 수</div><div class="chart-wrap"><canvas id="c_fg_own"></canvas></div></div>
 
   <div class="card">
-    <div class="card-title">IROS 등기정보광장에서 수집하는 데이터</div>
-    <div class="card-sub">6개 서비스 · 월별 갱신 · 서대문구/강남구/용산구</div>
+    <div class="card-title">IROS 데이터 수집 현황</div><div class="card-sub">6개 서비스 · 일별(신청현황) + 월별(소유현황)</div>
     <div class="iros-grid">
-      <div class="iros-item"><b>소유권이전 매수인 현황</b>누가 사는가: 내국인 / 외국인 / 재외국민 / 법인<span>📅 일별 조회 가능 · 지역별 집계</span></div>
-      <div class="iros-item"><b>부동산 소유현황 (외국인 국적별)</b>현재 누가 소유: 중국 / 미국 / 캐나다 / 대만 등<span>📆 월별 스냅샷 · 토지/건물/집합건물별</span></div>
-      <div class="iros-item"><b>부동산 소유현황 (내/외국인)</b>전체 소유자 구성: 내국인 / 외국인 / 법인<span>📆 월별 스냅샷</span></div>
-      <div class="iros-item"><b>매매 매수인 (내/외국인)</b>매매 거래 매수인 분류<span>📅 일별 조회 가능</span></div>
-      <div class="iros-item"><b>매매 매수인 (외국인 국적별)</b>어느 나라 사람이 사는가<span>📅 일별 조회 가능 · 핵심 데이터</span></div>
-      <div class="iros-item"><b>매매 부동산 현황</b>어떤 부동산이 거래되는가<span>📅 일별 조회 가능</span></div>
+      <div class="iros-item"><b>소유권이전 매수인 현황</b>내국인/외국인/재외국민/법인<span>📅 일별 조회</span></div>
+      <div class="iros-item"><b>소유현황 (외국인 국적별)</b>중국/미국/캐나다/대만 등<span>📆 월별 스냅샷</span></div>
+      <div class="iros-item"><b>소유현황 (내/외국인)</b>내국인/외국인/법인 소유자 수<span>📆 월별 스냅샷</span></div>
+      <div class="iros-item"><b>매매 매수인 (내/외국인)</b>매매 건별 매수인 구분<span>📅 일별 조회</span></div>
+      <div class="iros-item"><b>매매 매수인 (국적별)</b>외국인 국적별 매수 건수<span>📅 일별 조회 · 핵심</span></div>
+      <div class="iros-item"><b>매매 부동산 현황</b>거래 부동산 유형별 통계<span>📅 일별 조회</span></div>
     </div>
   </div>
-
-  <div class="info">
-    신청현황(소유권이전, 매매매수인) 데이터는 일별 날짜 범위로 조회 가능합니다. 파이프라인은 매일 최근 7일치를 수집합니다. 소유현황(현재 누가 소유하고 있는가)은 월별 스냅샷으로만 제공됩니다. KOSIS 국적별 통계는 반기(6개월)마다 공표됩니다. 등기완료 기준으로 집계되므로 계약일 기준인 국토교통부 실거래가보다 1-2개월 후행할 수 있습니다.
-  </div>
+  <div class="info">신청현황(소유권이전, 매매매수인) 데이터는 일별 조회 가능합니다. 파이프라인은 매일 최근 7일치를 수집합니다. 소유현황(현재 소유자)은 월별 스냅샷입니다. 등기완료 기준으로 집계되어 계약일 기준 실거래가보다 1-2개월 후행합니다.</div>
 </div>
 
-<!-- 국적별 현황 -->
+<!-- 국적별 -->
 <div class="section" id="sec-nationality">
-  <div class="card"><div class="card-title">전국 외국인 주택소유 국적별 현황</div><div class="card-sub">국토교통부 반기 통계 + IROS 등기기록</div><div class="chart-wrap"><canvas id="chartNationality"></canvas></div></div>
-  <div class="card">
-    <div class="card-title">국적별 상세</div><div class="card-sub">전국 외국인 주택 소유 가구 수</div>
-    <table class="nat-table"><thead><tr><th>국적</th><th>소유 가구</th><th>비율</th><th></th></tr></thead><tbody id="natTableBody"></tbody></table>
-  </div>
-  <div class="info">미국 국적 보유자의 상당수(55%+)는 재외동포(Korean-American)입니다. 장기체류 외국인 대비 주택소유 비율은 미국(27.0%), 캐나다(24.1%), 호주(21.9%) 순입니다.</div>
+  <div class="card"><div class="card-title">전국 외국인 주택소유 국적별</div><div class="card-sub">국토교통부 반기 통계 + IROS 등기기록</div><div class="chart-wrap"><canvas id="c_nat_pie"></canvas></div></div>
+  <div class="card"><div class="card-title">국적별 상세</div><div class="card-sub">전국 외국인 주택 소유 가구 수</div><table class="nat-table"><thead><tr><th>국적</th><th>소유 가구</th><th>비율</th><th></th></tr></thead><tbody id="natTb"></tbody></table></div>
+  <div class="info">미국 국적 보유자의 55%+는 재외동포(Korean-American)입니다. 장기체류 외국인 대비 주택소유 비율: 미국(27.0%), 캐나다(24.1%), 호주(21.9%).</div>
 </div>
 
 <!-- 매매가 추이 -->
 <div class="section" id="sec-price">
-  <div class="card"><div class="card-title">부동산 유형별 평균 매매가</div><div class="card-sub">아파트 / 연립다세대 / 단독다가구 / 오피스텔</div><div class="chart-wrap"><canvas id="chartByType"></canvas></div></div>
-  <div class="card"><div class="card-title">전세 보증금 추이</div><div class="card-sub">아파트 전세 기준 (만원)</div><div class="chart-wrap"><canvas id="chartJeonse"></canvas></div></div>
+  <div class="card"><div class="card-title">부동산 유형별 평균 매매가</div><div class="card-sub">아파트/연립다세대/단독다가구/오피스텔</div><div class="chart-wrap"><canvas id="c_pr_type"></canvas></div></div>
+  <div class="card"><div class="card-title">전세 보증금 추이</div><div class="card-sub">아파트 전세 기준 (만원)</div><div class="chart-wrap"><canvas id="c_pr_jeonse"></canvas></div></div>
 </div>
 
 <!-- 데이터 출처 -->
 <div class="section" id="sec-sources">
-  <div class="card">
-    <div class="card-title">데이터 수집 파이프라인</div><div class="card-sub">매일 오전 6시(KST) 자동 실행</div>
-    <table class="nat-table">
-      <thead><tr><th>출처</th><th>데이터</th><th>주기</th></tr></thead>
-      <tbody>
-        <tr><td>국토교통부 실거래가 API</td><td>아파트/연립/단독/오피스텔/토지/상업용 매매 및 전월세</td><td>일별 누적</td></tr>
-        <tr><td>등기정보광장 Open API (6개)</td><td>소유권이전, 매매매수인 (내/외국인, 국적별)</td><td>일별 (신청현황) / 월별 (소유현황)</td></tr>
-        <tr><td>한국부동산원 통계 API</td><td>주택가격지수, 전세가율</td><td>주간/월간</td></tr>
-        <tr><td>KB부동산 (PublicDataReader)</td><td>KB시세, 매매/전세 가격지수, 유형별 변동률</td><td>주간</td></tr>
-        <tr><td>KOSIS 국가통계포털</td><td>외국인 주택/토지 소유 국적별</td><td>반기</td></tr>
-      </tbody>
-    </table>
-  </div>
-  <div class="info">이 대시보드는 GitHub Actions를 통해 매일 자동으로 공공 API에서 데이터를 수집하고 업데이트됩니다. 코드 저장소는 비공개이며, 이 페이지에는 수집된 결과만 표시됩니다.</div>
+  <div class="card"><div class="card-title">데이터 수집 파이프라인</div><div class="card-sub">매일 오전 6시(KST) 자동 실행</div>
+    <table class="nat-table"><thead><tr><th>출처</th><th>데이터</th><th>주기</th></tr></thead><tbody>
+      <tr><td>국토교통부 실거래가 API</td><td>아파트/연립/단독/오피스텔/토지/상업용</td><td>일별 누적</td></tr>
+      <tr><td>등기정보광장 Open API</td><td>매수인 현황, 외국인 국적별, 소유현황</td><td>일별 + 월별</td></tr>
+      <tr><td>한국부동산원 통계 API</td><td>주택가격지수, 전세가율</td><td>주간/월간</td></tr>
+      <tr><td>KB부동산</td><td>KB시세, 유형별 가격, 주간 시세</td><td>주간</td></tr>
+      <tr><td>KOSIS</td><td>외국인 주택소유 국적별</td><td>반기</td></tr>
+    </tbody></table></div>
+  <div class="info">이 대시보드는 GitHub Actions로 매일 공공 API에서 자동 수집하여 업데이트됩니다. 코드는 비공개이며 결과만 표시됩니다.</div>
 </div>
 
 <div class="footer">서울 부동산 거래 동향 트래커 · 데이터 출처: 국토교통부, 등기정보광장, 한국부동산원, KB부동산, KOSIS</div>
 
 <script>
-const C={yeonhui:'#534AB7',gangnam:'#D85A30',hannam:'#1D9E75',blue:'#378ADD',amber:'#BA7517',pink:'#D4537E',gray:'#888780'};
+const C={yh:'#534AB7',gn:'#D85A30',hn:'#1D9E75',bl:'#378ADD',am:'#BA7517',pk:'#D4537E',gr:'#888780'};
+function g(b,v,d,n){const a=[b];for(let i=1;i<n;i++)a.push(Math.round(a[i-1]+d+(Math.random()-.5)*v));return a;}
 
-function gen(b,v,d,n){const a=[b];for(let i=1;i<n;i++)a.push(Math.round(a[i-1]+d+(Math.random()-.5)*v));return a;}
-function genPct(n,center,spread){return Array.from({length:n},()=>+(center+(Math.random()-.5)*spread).toFixed(2));}
+// Use seeded random for consistent values per session
+let _seed=42;function srand(){_seed=((_seed*16807)%2147483647);return(_seed-1)/2147483646;}
+function sg(b,v,d,n){const a=[b];for(let i=1;i<n;i++)a.push(Math.round(a[i-1]+d+(srand()-.5)*v));return a;}
+function spct(n,c,s){return Array.from({length:n},()=>+(c+(srand()-.5)*s).toFixed(2));}
 
-// Monthly labels
-const months=[];for(let y=2024;y<=2026;y++)for(let m=1;m<=12;m++){if(y===2024&&m<7)continue;if(y===2026&&m>3)break;months.push(`${y}-${String(m).padStart(2,'0')}`);}
-const mL=months.map(m=>m.slice(2));
+// Monthly (21 months)
+const mo=[];for(let y=2024;y<=2026;y++)for(let m=1;m<=12;m++){if(y===2024&&m<7)continue;if(y===2026&&m>3)break;mo.push(`${y}-${String(m).padStart(2,'0')}`);}
+const moL=mo.map(m=>m.slice(2));
 
-// Weekly labels (25 weeks)
-const wL=[];const now=new Date(2026,3,2);for(let i=24;i>=0;i--){const d=new Date(now);d.setDate(d.getDate()-i*7);wL.push(`${d.getMonth()+1}/${d.getDate()}`);}
+// Weekly (25 weeks)
+const wL=[];const now=new Date(2026,3,2);for(let i=24;i>=0;i--){const d=new Date(now);d.setDate(d.getDate()-i*7);wL.push(`${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`);}
 
-// Simulated monthly data
-const sim={
-  yeonhui:gen(62000,4000,800,21),gangnam:gen(210000,12000,2500,21),hannam:gen(185000,10000,1800,21),
-  yeonhuiJ:gen(32000,2000,300,21),gangnamJ:gen(120000,8000,1000,21),hannamJ:gen(95000,6000,600,21),
-  volY:gen(15,8,0,21),volG:gen(280,60,5,21),volH:gen(45,20,2,21),
-  fgn:gen(120,30,5,21).map(v=>Math.max(v,50)),dom:gen(2800,400,50,21).map(v=>Math.max(v,1500)),ovs:gen(45,15,2,21).map(v=>Math.max(v,15)),
+// Daily (30 days)
+const dL=[];for(let i=29;i>=0;i--){const d=new Date(now);d.setDate(d.getDate()-i);dL.push(`${d.getMonth()+1}/${d.getDate()}`);}
+
+// Simulated data (seeded = consistent per session)
+const S={
+  yh:sg(62000,4000,800,21),gn:sg(210000,12000,2500,21),hn:sg(185000,10000,1800,21),
+  yhJ:sg(32000,2000,300,21),gnJ:sg(120000,8000,1000,21),hnJ:sg(95000,6000,600,21),
+  vY:sg(15,8,0,21),vG:sg(280,60,5,21),vH:sg(45,20,2,21),
+  fg:sg(120,30,5,21).map(v=>Math.max(v,50)),dm:sg(2800,400,50,21).map(v=>Math.max(v,1500)),ov:sg(45,15,2,21).map(v=>Math.max(v,15)),
 };
 
-// Simulated weekly data
-const w={
-  seoulApt:genPct(25,0.15,0.6), sdmApt:genPct(25,0.10,0.8), gnApt:genPct(25,0.20,0.7), ysApt:genPct(25,0.18,0.9),
-  seoulVilla:genPct(25,0.05,0.5), seoulHouse:genPct(25,0.03,0.4), seoulOffi:genPct(25,0.08,0.5),
-  seoulAptJ:genPct(25,0.10,0.5), sdmAptJ:genPct(25,0.08,0.6), gnAptJ:genPct(25,0.12,0.5), ysAptJ:genPct(25,0.09,0.7),
-  seoulVillaJ:genPct(25,0.04,0.4), seoulHouseJ:genPct(25,0.02,0.35),
-  volY:Array.from({length:25},()=>Math.round(Math.random()*8+2)),
-  volG:Array.from({length:25},()=>Math.round(Math.random()*80+40)),
-  volH:Array.from({length:25},()=>Math.round(Math.random()*25+5)),
+// Weekly prices (만원/3.3㎡)
+const W={
+  aptSdm:sg(2800,80,15,25),aptGn:sg(7200,150,30,25),aptYs:sg(5900,120,25,25),
+  vilSdm:sg(1200,50,8,25),vilGn:sg(2800,80,15,25),vilYs:sg(2200,60,10,25),
+  houSdm:sg(18000,1500,200,25),houGn:sg(65000,3000,500,25),houYs:sg(48000,2500,400,25),
+  jsSdm:sg(1800,60,10,25),jsGn:sg(4500,100,20,25),jsYs:sg(3800,80,15,25),
+  vY:sg(4,3,0,25).map(v=>Math.max(v,1)),vG:sg(65,30,0,25).map(v=>Math.max(v,10)),vH:sg(18,10,0,25).map(v=>Math.max(v,3)),
+};
+
+// Daily foreigner (30 days)
+const D={
+  fgn:Array.from({length:30},()=>Math.round(3+srand()*12)),
+  ovs:Array.from({length:30},()=>Math.round(srand()*4)),
+  dom:Array.from({length:30},()=>Math.round(80+srand()*60)),
 };
 
 const natData=[
-  {name:'중국',count:58896,pct:56.6,color:C.gangnam},{name:'미국',count:22455,pct:21.6,color:C.yeonhui},
-  {name:'캐나다',count:6433,pct:6.2,color:C.hannam},{name:'대만',count:3400,pct:3.3,color:C.blue},
-  {name:'호주',count:2000,pct:1.9,color:C.amber},{name:'베트남',count:1800,pct:1.7,color:C.pink},
-  {name:'일본',count:1600,pct:1.5,color:'#639922'},{name:'기타',count:7481,pct:7.2,color:C.gray},
-];
+  {n:'중국',c:58896,p:56.6,cl:C.gn},{n:'미국',c:22455,p:21.6,cl:C.yh},{n:'캐나다',c:6433,p:6.2,cl:C.hn},
+  {n:'대만',c:3400,p:3.3,cl:C.bl},{n:'호주',c:2000,p:1.9,cl:C.am},{n:'베트남',c:1800,p:1.7,cl:C.pk},
+  {n:'일본',c:1600,p:1.5,cl:'#639922'},{n:'기타',c:7481,p:7.2,cl:C.gr}];
 
-async function loadData(){try{const r=await fetch('data/meta.json');if(r.ok){const m=await r.json();document.getElementById('lastUpdate').textContent=new Date(m.last_update).toLocaleString('ko-KR');return;}}catch(e){}document.getElementById('lastUpdate').textContent='시뮬레이션 데이터 (파이프라인 데이터 대기 중)';}
+async function loadData(){try{const r=await fetch('data/meta.json');if(r.ok){const m=await r.json();document.getElementById('lastUpdate').textContent=new Date(m.last_update).toLocaleString('ko-KR');return;}}catch(e){}document.getElementById('lastUpdate').textContent='시뮬레이션 데이터 (파이프라인 연결 대기 중)';}
 
-const LL=sim.yeonhui.length-1;
-document.getElementById('s1').textContent=(sim.yeonhui[LL]/10000).toFixed(1)+'억';
-document.getElementById('s2').textContent=(sim.gangnam[LL]/10000).toFixed(1)+'억';
-document.getElementById('s3').textContent=(sim.hannam[LL]/10000).toFixed(1)+'억';
-const tot=sim.dom[LL]+sim.fgn[LL]+sim.ovs[LL];
-document.getElementById('s4').textContent=((sim.fgn[LL]+sim.ovs[LL])/tot*100).toFixed(1)+'%';
+const L=S.yh.length-1;
+document.getElementById('s1').textContent=(S.yh[L]/10000).toFixed(1)+'억';
+document.getElementById('s2').textContent=(S.gn[L]/10000).toFixed(1)+'억';
+document.getElementById('s3').textContent=(S.hn[L]/10000).toFixed(1)+'억';
+const tt=S.dm[L]+S.fg[L]+S.ov[L];
+document.getElementById('s4').textContent=((S.fg[L]+S.ov[L])/tt*100).toFixed(1)+'%';
 
-Chart.defaults.font.family="-apple-system,'Pretendard',sans-serif";
-Chart.defaults.font.size=11;
-Chart.defaults.plugins.legend.labels.boxWidth=12;
-Chart.defaults.plugins.legend.labels.padding=14;
+Chart.defaults.font.family="-apple-system,'Pretendard',sans-serif";Chart.defaults.font.size=11;Chart.defaults.plugins.legend.labels.boxWidth=12;Chart.defaults.plugins.legend.labels.padding=14;
 const gC='rgba(200,198,190,0.25)';
 const dot={pointRadius:3,pointHoverRadius:6,pointBackgroundColor:'#fff',pointBorderWidth:2,pointHoverBorderWidth:2.5};
 
-function mkLine(id,labels,datasets,opts={}){
-  datasets.forEach(ds=>{if(!ds.noDot)Object.assign(ds,dot);ds.pointBorderColor=ds.borderColor;ds.tension=ds.tension||0.3;});
-  return new Chart(document.getElementById(id),{type:'line',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
-    scales:{x:{grid:{display:false},ticks:{maxTicksLimit:opts.maxT||10}},y:{grid:{color:gC},ticks:{callback:v=>opts.yF?opts.yF(v):v},...(opts.yO||{})}},
-    plugins:{tooltip:{callbacks:{label:c=>{const v=c.parsed.y;return c.dataset.label+': '+(opts.tF?opts.tF(v):v.toLocaleString())}}},legend:{position:'top'}}}});
-}
-function mkBar(id,labels,datasets,opts={}){
-  return new Chart(document.getElementById(id),{type:'bar',data:{labels,datasets},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
-    scales:{x:{grid:{display:false},ticks:{maxTicksLimit:opts.maxT||10}},y:{grid:{color:gC},ticks:{callback:v=>opts.yF?opts.yF(v):v}}},
-    plugins:{tooltip:{callbacks:{label:c=>c.dataset.label+': '+(opts.tF?opts.tF(c.parsed.y):c.parsed.y.toLocaleString())}},legend:{position:'top'}}}});
-}
+function mkL(id,lb,ds,o={}){ds.forEach(d=>{Object.assign(d,dot);d.pointBorderColor=d.borderColor;d.tension=d.tension||0.3;});
+  return new Chart(document.getElementById(id),{type:'line',data:{labels:lb,datasets:ds},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+  scales:{x:{grid:{display:false},ticks:{maxTicksLimit:o.mx||10}},y:{grid:{color:gC},ticks:{callback:v=>o.yF?o.yF(v):v},...(o.yO||{})}},
+  plugins:{tooltip:{callbacks:{label:c=>{const v=c.parsed.y;return c.dataset.label+': '+(o.tF?o.tF(v):v.toLocaleString())}}},legend:{position:'top'}}}});}
+function mkB(id,lb,ds,o={}){return new Chart(document.getElementById(id),{type:'bar',data:{labels:lb,datasets:ds},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+  scales:{x:{grid:{display:false},ticks:{maxTicksLimit:o.mx||10}},y:{grid:{color:gC},ticks:{callback:v=>o.yF?o.yF(v):v},...(o.yO||{})}},
+  plugins:{tooltip:{callbacks:{label:c=>c.dataset.label+': '+(o.tF?o.tF(c.parsed.y):c.parsed.y.toLocaleString())}},legend:{position:'top'}}}});}
 
-const fA=v=>(v/10000).toFixed(0)+'억', fMT=v=>v.toLocaleString()+'만원';
+const fA=v=>(v/10000).toFixed(0)+'억',fM=v=>v.toLocaleString()+'만원';
 
-// === 종합 현황 ===
-mkLine('chartPrice',mL,[
-  {label:'연희동',data:sim.yeonhui,borderColor:C.yeonhui,borderWidth:2.5},
-  {label:'강남구',data:sim.gangnam,borderColor:C.gangnam,borderWidth:2},
-  {label:'한남동',data:sim.hannam,borderColor:C.hannam,borderWidth:2},
-],{yF:fA,tF:fMT});
-mkBar('chartVolume',mL,[
-  {label:'강남구',data:sim.volG,backgroundColor:C.gangnam+'cc',borderRadius:3},
-  {label:'한남동',data:sim.volH,backgroundColor:C.hannam+'cc',borderRadius:3},
-  {label:'연희동',data:sim.volY,backgroundColor:C.yeonhui+'cc',borderRadius:3},
-],{tF:v=>v+'건'});
+// === 종합 ===
+mkL('c_ov_price',moL,[{label:'연희동',data:S.yh,borderColor:C.yh,borderWidth:2.5},{label:'강남구',data:S.gn,borderColor:C.gn,borderWidth:2},{label:'한남동',data:S.hn,borderColor:C.hn,borderWidth:2}],{yF:fA,tF:fM});
+mkB('c_ov_vol',moL,[{label:'강남구',data:S.vG,backgroundColor:C.gn+'cc',borderRadius:3},{label:'한남동',data:S.vH,backgroundColor:C.hn+'cc',borderRadius:3},{label:'연희동',data:S.vY,backgroundColor:C.yh+'cc',borderRadius:3}],{tF:v=>v+'건'});
 
-// === 주간 동향 ===
-// 1. 아파트 구별
-mkLine('chartWkAptDist',wL,[
-  {label:'서울 전체',data:w.seoulApt,borderColor:C.gray,borderWidth:1.5,borderDash:[4,3]},
-  {label:'서대문구',data:w.sdmApt,borderColor:C.yeonhui,borderWidth:2.5},
-  {label:'강남구',data:w.gnApt,borderColor:C.gangnam,borderWidth:2},
-  {label:'용산구',data:w.ysApt,borderColor:C.hannam,borderWidth:2},
-],{yF:v=>v+'%',tF:v=>v+'%',maxT:13,yO:{suggestedMin:-0.5,suggestedMax:0.8}});
-
-// 2. 유형별 매매 (NEW)
-mkLine('chartWkByType',wL,[
-  {label:'아파트',data:w.seoulApt,borderColor:C.yeonhui,borderWidth:2.5},
-  {label:'연립다세대',data:w.seoulVilla,borderColor:C.hannam,borderWidth:2},
-  {label:'단독주택',data:w.seoulHouse,borderColor:C.gangnam,borderWidth:2},
-  {label:'오피스텔',data:w.seoulOffi,borderColor:C.amber,borderWidth:1.5,borderDash:[4,3]},
-],{yF:v=>v+'%',tF:v=>v+'%',maxT:13,yO:{suggestedMin:-0.5,suggestedMax:0.7}});
-
-// 3. 전세 구별
-mkLine('chartWkJeonse',wL,[
-  {label:'서울 전체',data:w.seoulAptJ,borderColor:C.gray,borderWidth:1.5,borderDash:[4,3]},
-  {label:'서대문구',data:w.sdmAptJ,borderColor:C.yeonhui,borderWidth:2.5},
-  {label:'강남구',data:w.gnAptJ,borderColor:C.gangnam,borderWidth:2},
-  {label:'용산구',data:w.ysAptJ,borderColor:C.hannam,borderWidth:2},
-],{yF:v=>v+'%',tF:v=>v+'%',maxT:13,yO:{suggestedMin:-0.5,suggestedMax:0.7}});
-
-// 4. 전세 유형별 (NEW)
-mkLine('chartWkJeonseType',wL,[
-  {label:'아파트 전세',data:w.seoulAptJ,borderColor:C.yeonhui,borderWidth:2.5},
-  {label:'연립다세대 전세',data:w.seoulVillaJ,borderColor:C.hannam,borderWidth:2},
-  {label:'단독주택 전세',data:w.seoulHouseJ,borderColor:C.gangnam,borderWidth:2},
-],{yF:v=>v+'%',tF:v=>v+'%',maxT:13,yO:{suggestedMin:-0.5,suggestedMax:0.6}});
-
-// 5. 거래 건수
-mkBar('chartWkVol',wL,[
-  {label:'강남구',data:w.volG,backgroundColor:C.gangnam+'cc',borderRadius:3},
-  {label:'용산구',data:w.volH,backgroundColor:C.hannam+'cc',borderRadius:3},
-  {label:'서대문구',data:w.volY,backgroundColor:C.yeonhui+'cc',borderRadius:3},
-],{tF:v=>v+'건',maxT:13});
+// === 주간: 실제 가격 ===
+mkL('c_wk_apt',wL,[{label:'서대문구',data:W.aptSdm,borderColor:C.yh,borderWidth:2.5},{label:'강남구',data:W.aptGn,borderColor:C.gn,borderWidth:2},{label:'용산구',data:W.aptYs,borderColor:C.hn,borderWidth:2}],{yF:v=>v.toLocaleString(),tF:v=>v.toLocaleString()+'만원/3.3㎡',mx:13});
+mkL('c_wk_villa',wL,[{label:'서대문구',data:W.vilSdm,borderColor:C.yh,borderWidth:2.5},{label:'강남구',data:W.vilGn,borderColor:C.gn,borderWidth:2},{label:'용산구',data:W.vilYs,borderColor:C.hn,borderWidth:2}],{yF:v=>v.toLocaleString(),tF:v=>v.toLocaleString()+'만원/3.3㎡',mx:13});
+mkL('c_wk_house',wL,[{label:'서대문구',data:W.houSdm,borderColor:C.yh,borderWidth:2.5},{label:'강남구',data:W.houGn,borderColor:C.gn,borderWidth:2},{label:'용산구',data:W.houYs,borderColor:C.hn,borderWidth:2}],{yF:fA,tF:fM,mx:13});
+mkL('c_wk_jeonse',wL,[{label:'서대문구',data:W.jsSdm,borderColor:C.yh,borderWidth:2.5},{label:'강남구',data:W.jsGn,borderColor:C.gn,borderWidth:2},{label:'용산구',data:W.jsYs,borderColor:C.hn,borderWidth:2}],{yF:v=>v.toLocaleString(),tF:v=>v.toLocaleString()+'만원/3.3㎡',mx:13});
+mkB('c_wk_vol',wL,[{label:'강남구',data:W.vG,backgroundColor:C.gn+'cc',borderRadius:3},{label:'용산구',data:W.vH,backgroundColor:C.hn+'cc',borderRadius:3},{label:'서대문구',data:W.vY,backgroundColor:C.yh+'cc',borderRadius:3}],{tF:v=>v+'건',mx:13});
 
 // === 외국인 동향 ===
-mkBar('chartForeigner',mL,[
-  {label:'외국인',data:sim.fgn,backgroundColor:C.gangnam+'cc',borderRadius:3},
-  {label:'재외동포',data:sim.ovs,backgroundColor:C.hannam+'cc',borderRadius:3},
-],{tF:v=>v+'건'});
-const fPct=months.map((_,i)=>{const t=sim.dom[i]+sim.fgn[i]+sim.ovs[i];return+((sim.fgn[i]+sim.ovs[i])/t*100).toFixed(1);});
-mkLine('chartForeignerPct',mL,[
-  {label:'외국인+재외동포 비율',data:fPct,borderColor:C.gangnam,backgroundColor:C.gangnam+'18',fill:true,borderWidth:2},
-],{yF:v=>v+'%',tF:v=>v+'%',yO:{min:0}});
+// 일별 매수 건수 (최근 30일)
+mkB('c_fg_daily',dL,[{label:'외국인',data:D.fgn,backgroundColor:C.gn+'cc',borderRadius:2},{label:'재외동포',data:D.ovs,backgroundColor:C.hn+'cc',borderRadius:2}],{tF:v=>v+'건',mx:15});
+
+// 구별 외국인 매수 비율
+new Chart(document.getElementById('c_fg_dist'),{type:'bar',data:{labels:['서대문구','강남구','용산구'],datasets:[
+  {label:'내국인',data:[85,78,72],backgroundColor:C.yh+'88'},{label:'외국인',data:[8,12,18],backgroundColor:C.gn+'cc'},{label:'재외동포',data:[4,5,6],backgroundColor:C.hn+'cc'},{label:'법인',data:[3,5,4],backgroundColor:C.gr+'88'}
+]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,grid:{color:gC},ticks:{callback:v=>v+'%'},max:100}},plugins:{tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.y+'%'}},legend:{position:'top'}}}});
+
+// 외국인 국적별 매수 (최근 기간)
+new Chart(document.getElementById('c_fg_nat'),{type:'doughnut',data:{labels:['중국','미국','캐나다','베트남','일본','기타'],datasets:[{data:[42,18,8,12,5,15],backgroundColor:[C.gn,C.yh,C.hn,C.pk,'#639922',C.gr],borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{tooltip:{callbacks:{label:c=>c.label+': '+c.parsed+'%'}}}}});
+
+// 월별 외국인 매수 추이
+mkB('c_fg_monthly',moL,[{label:'외국인',data:S.fg,backgroundColor:C.gn+'cc',borderRadius:3},{label:'재외동포',data:S.ov,backgroundColor:C.hn+'cc',borderRadius:3}],{tF:v=>v+'건'});
+
+// 부동산 유형 (외국인 매수 대상)
+new Chart(document.getElementById('c_fg_type'),{type:'bar',data:{labels:['서대문구','강남구','용산구'],datasets:[
+  {label:'집합건물(아파트 등)',data:[55,72,65],backgroundColor:C.yh+'cc',borderRadius:3},
+  {label:'일반건물',data:[25,15,20],backgroundColor:C.hn+'cc',borderRadius:3},
+  {label:'토지',data:[20,13,15],backgroundColor:C.am+'cc',borderRadius:3}
+]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{grid:{display:false}},y:{grid:{color:gC},ticks:{callback:v=>v+'%'},max:100}},plugins:{tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.y+'%'}},legend:{position:'top'}}}});
+
+// 구별 외국인 소유 현황 (스냅샷)
+new Chart(document.getElementById('c_fg_own'),{type:'bar',data:{labels:['서대문구','강남구','용산구'],datasets:[
+  {label:'외국인 소유',data:[320,1850,980],backgroundColor:C.gn+'cc',borderRadius:3},
+  {label:'재외동포 소유',data:[180,620,450],backgroundColor:C.hn+'cc',borderRadius:3}
+]},options:{responsive:true,maintainAspectRatio:false,scales:{x:{grid:{display:false}},y:{grid:{color:gC}}},plugins:{tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.y.toLocaleString()+'건'}},legend:{position:'top'}}}});
 
 // === 국적별 ===
-new Chart(document.getElementById('chartNationality'),{type:'doughnut',data:{labels:natData.map(d=>d.name),datasets:[{data:natData.map(d=>d.count),backgroundColor:natData.map(d=>d.color),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{tooltip:{callbacks:{label:c=>c.label+': '+c.parsed.toLocaleString()+'가구'}}}}});
-const tb=document.getElementById('natTableBody');natData.forEach(d=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${d.name}</td><td>${d.count.toLocaleString()}가구</td><td><div class="bar-bg"><div class="bar-fill" style="width:${d.count/natData[0].count*100}%;background:${d.color}"></div></div></td><td>${d.pct}%</td>`;tb.appendChild(tr);});
+new Chart(document.getElementById('c_nat_pie'),{type:'doughnut',data:{labels:natData.map(d=>d.n),datasets:[{data:natData.map(d=>d.c),backgroundColor:natData.map(d=>d.cl),borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{tooltip:{callbacks:{label:c=>c.label+': '+c.parsed.toLocaleString()+'가구'}}}}});
+const tb=document.getElementById('natTb');natData.forEach(d=>{const tr=document.createElement('tr');tr.innerHTML=`<td>${d.n}</td><td>${d.c.toLocaleString()}가구</td><td><div class="bar-bg"><div class="bar-fill" style="width:${d.c/natData[0].c*100}%;background:${d.cl}"></div></div></td><td>${d.p}%</td>`;tb.appendChild(tr);});
 
 // === 매매가 추이 ===
-mkLine('chartByType',mL,[
-  {label:'아파트',data:gen(180000,10000,2000,21),borderColor:C.yeonhui,borderWidth:2},
-  {label:'단독다가구',data:gen(85000,6000,800,21),borderColor:C.gangnam,borderWidth:1.5},
-  {label:'연립다세대',data:gen(45000,3000,500,21),borderColor:C.hannam,borderWidth:1.5},
-  {label:'오피스텔',data:gen(38000,2500,400,21),borderColor:C.amber,borderWidth:1.5,borderDash:[4,3]},
-],{yF:fA,tF:fMT});
-mkLine('chartJeonse',mL,[
-  {label:'연희동',data:sim.yeonhuiJ,borderColor:C.yeonhui,borderWidth:2.5},
-  {label:'강남구',data:sim.gangnamJ,borderColor:C.gangnam,borderWidth:2},
-  {label:'한남동',data:sim.hannamJ,borderColor:C.hannam,borderWidth:2},
-],{yF:fA,tF:fMT});
+mkL('c_pr_type',moL,[{label:'아파트',data:sg(180000,10000,2000,21),borderColor:C.yh,borderWidth:2},{label:'단독다가구',data:sg(85000,6000,800,21),borderColor:C.gn,borderWidth:1.5},{label:'연립다세대',data:sg(45000,3000,500,21),borderColor:C.hn,borderWidth:1.5},{label:'오피스텔',data:sg(38000,2500,400,21),borderColor:C.am,borderWidth:1.5,borderDash:[4,3]}],{yF:fA,tF:fM});
+mkL('c_pr_jeonse',moL,[{label:'연희동',data:S.yhJ,borderColor:C.yh,borderWidth:2.5},{label:'강남구',data:S.gnJ,borderColor:C.gn,borderWidth:2},{label:'한남동',data:S.hnJ,borderColor:C.hn,borderWidth:2}],{yF:fA,tF:fM});
 
-function showTab(id){
-  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById('sec-'+id).classList.add('active');
-  const ids=['overview','weekly','foreigner','nationality','price','sources'];
-  document.querySelectorAll('.tab')[ids.indexOf(id)].classList.add('active');
-}
+function showTab(id){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));document.getElementById('sec-'+id).classList.add('active');const ids=['overview','weekly','foreigner','nationality','price','sources'];document.querySelectorAll('.tab')[ids.indexOf(id)].classList.add('active');}
 loadData();
 </script>
 </body>
