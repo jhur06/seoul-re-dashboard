@@ -77,8 +77,10 @@
 
 <!-- 종합 현황 -->
 <div class="section active" id="sec-overview">
+  <div class="card"><div class="card-title">지역별 연립다세대 매매가 추이 (월별)</div><div class="card-sub">국토교통부 실거래가 · 평균가 기준</div><div class="card-hint">차트 위에 마우스를 올리면 정확한 가격을 확인할 수 있습니다</div><div class="chart-wrap"><canvas id="c_ov_villa"></canvas></div></div>
+  <div class="card"><div class="card-title">지역별 단독다가구 매매가 추이 (월별)</div><div class="card-sub">국토교통부 실거래가 · 평균가 기준</div><div class="card-hint">차트 위에 마우스를 올리면 정확한 가격을 확인할 수 있습니다</div><div class="chart-wrap"><canvas id="c_ov_house"></canvas></div></div>
   <div class="card"><div class="card-title">지역별 아파트 매매가 추이 (월별)</div><div class="card-sub">국토교통부 실거래가 · 평균가 기준</div><div class="card-hint">차트 위에 마우스를 올리면 정확한 가격을 확인할 수 있습니다</div><div class="chart-wrap"><canvas id="c_ov_price"></canvas></div></div>
-  <div class="card"><div class="card-title">월별 거래 건수</div><div class="card-sub">지역별 아파트 매매 신고 건수</div><div class="card-hint">차트 위에 마우스를 올리면 정확한 건수를 확인할 수 있습니다</div><div class="chart-wrap"><canvas id="c_ov_vol"></canvas></div></div>
+  <div class="card"><div class="card-title">월별 거래 건수 (전체 유형)</div><div class="card-sub">지역별 매매 신고 건수 · 아파트+연립다세대+단독다가구+오피스텔 합산</div><div class="card-hint">차트 위에 마우스를 올리면 정확한 건수를 확인할 수 있습니다</div><div class="chart-wrap"><canvas id="c_ov_vol"></canvas></div></div>
 </div>
 
 <!-- 주간 시세 -->
@@ -197,10 +199,10 @@ const natData=[
 // ===== TOP TABLE =====
 const L=S.yh.length-1;
 const ovData=[
-  {type:'아파트',sdm:S.yh[L],gn:S.gn[L],ys:S.hn[L]},
   {type:'연립다세대',sdm:sg(28000,3000,400,21)[L],gn:sg(65000,5000,800,21)[L],ys:sg(55000,4000,700,21)[L]},
   {type:'단독다가구',sdm:sg(42000,4000,500,21)[L],gn:sg(120000,8000,1200,21)[L],ys:sg(95000,7000,1000,21)[L]},
   {type:'오피스텔',sdm:sg(15000,2000,200,21)[L],gn:sg(38000,3000,500,21)[L],ys:sg(32000,2500,400,21)[L]},
+  {type:'아파트',sdm:S.yh[L],gn:S.gn[L],ys:S.hn[L]},
 ];
 const ovTb=document.getElementById('ovTableBody');
 function fmtP(v){return v>=10000?(v/10000).toFixed(1)+'억':v.toLocaleString()+'만';}
@@ -232,7 +234,11 @@ function mkB(id,lb,ds,o={}){return new Chart(document.getElementById(id),{type:'
 
 const fA=v=>(v/10000).toFixed(0)+'억',fM=v=>v.toLocaleString()+'만원';
 
-// === 종합 ===
+// === 종합 (연립다세대/단독다가구 우선) ===
+const villaY=sg(28000,3000,400,21),villaG=sg(65000,5000,800,21),villaH=sg(55000,4000,700,21);
+const houseY=sg(42000,4000,500,21),houseG=sg(120000,8000,1200,21),houseH=sg(95000,7000,1000,21);
+mkL('c_ov_villa',moL,[{label:'연희동',data:villaY,borderColor:C.yh,borderWidth:2.5},{label:'강남구',data:villaG,borderColor:C.gn,borderWidth:2},{label:'한남동',data:villaH,borderColor:C.hn,borderWidth:2}],{yF:fA,tF:fM});
+mkL('c_ov_house',moL,[{label:'연희동',data:houseY,borderColor:C.yh,borderWidth:2.5},{label:'강남구',data:houseG,borderColor:C.gn,borderWidth:2},{label:'한남동',data:houseH,borderColor:C.hn,borderWidth:2}],{yF:fA,tF:fM});
 mkL('c_ov_price',moL,[{label:'연희동',data:S.yh,borderColor:C.yh,borderWidth:2.5},{label:'강남구',data:S.gn,borderColor:C.gn,borderWidth:2},{label:'한남동',data:S.hn,borderColor:C.hn,borderWidth:2}],{yF:fA,tF:fM});
 mkB('c_ov_vol',moL,[{label:'강남구',data:S.vG,backgroundColor:C.gn+'cc',borderRadius:3},{label:'한남동',data:S.vH,backgroundColor:C.hn+'cc',borderRadius:3},{label:'연희동',data:S.vY,backgroundColor:C.yh+'cc',borderRadius:3}],{tF:v=>v+'건'});
 
