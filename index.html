@@ -102,7 +102,7 @@
     <div class="chart-wrap"><canvas id="chartWkVol"></canvas></div>
   </div>
   <div class="info">
-    주간 데이터는 KB부동산과 한국부동산원의 주간 가격동향조사 기반입니다. 매주 목요일 공표되며, PublicDataReader를 통해 API 키 없이 수집합니다. 외국인 거래 데이터는 주간 단위로 제공되지 않으며, 월별(IROS) 또는 반기별(KOSIS)로만 확인 가능합니다.
+    주간 가격 데이터는 KB부동산과 한국부동산원의 주간 가격동향조사 기반입니다. 매주 목요일 공표되며, PublicDataReader를 통해 API 키 없이 수집합니다. 외국인 매수인 신청현황(IROS)은 일별 조회가 가능하며, 매일 최근 7일치를 자동 수집합니다.
   </div>
 </div>
 
@@ -115,17 +115,17 @@
     <div class="card-title">IROS 등기정보광장에서 수집하는 데이터</div>
     <div class="card-sub">6개 서비스 · 월별 갱신 · 서대문구/강남구/용산구</div>
     <div class="iros-grid">
-      <div class="iros-item"><b>소유권이전 매수인 현황</b>누가 사는가: 내국인 / 외국인 / 재외국민 / 법인<span>매월 갱신 · 지역별 집계</span></div>
-      <div class="iros-item"><b>부동산 소유현황 (외국인 국적별)</b>현재 누가 소유: 중국 / 미국 / 캐나다 / 대만 등<span>매월 갱신 · 토지/건물/집합건물별</span></div>
-      <div class="iros-item"><b>부동산 소유현황 (내/외국인)</b>전체 소유자 구성: 내국인 / 외국인 / 법인<span>매월 갱신</span></div>
-      <div class="iros-item"><b>매매 매수인 (내/외국인)</b>매매 거래 매수인 분류<span>매월 갱신</span></div>
-      <div class="iros-item"><b>매매 매수인 (외국인 국적별)</b>어느 나라 사람이 사는가<span>매월 갱신 · 핵심 데이터</span></div>
-      <div class="iros-item"><b>매매 부동산 현황</b>어떤 부동산이 거래되는가<span>매월 갱신</span></div>
+      <div class="iros-item"><b>소유권이전 매수인 현황</b>누가 사는가: 내국인 / 외국인 / 재외국민 / 법인<span>📅 일별 조회 가능 · 지역별 집계</span></div>
+      <div class="iros-item"><b>부동산 소유현황 (외국인 국적별)</b>현재 누가 소유: 중국 / 미국 / 캐나다 / 대만 등<span>📆 월별 스냅샷 · 토지/건물/집합건물별</span></div>
+      <div class="iros-item"><b>부동산 소유현황 (내/외국인)</b>전체 소유자 구성: 내국인 / 외국인 / 법인<span>📆 월별 스냅샷</span></div>
+      <div class="iros-item"><b>매매 매수인 (내/외국인)</b>매매 거래 매수인 분류<span>📅 일별 조회 가능</span></div>
+      <div class="iros-item"><b>매매 매수인 (외국인 국적별)</b>어느 나라 사람이 사는가<span>📅 일별 조회 가능 · 핵심 데이터</span></div>
+      <div class="iros-item"><b>매매 부동산 현황</b>어떤 부동산이 거래되는가<span>📅 일별 조회 가능</span></div>
     </div>
   </div>
 
   <div class="info">
-    외국인 거래 데이터는 주간 단위로 제공되지 않습니다. IROS 등기정보광장은 매월 갱신되며, KOSIS 국적별 통계는 반기(6개월)마다 공표됩니다. 등기완료 기준으로 집계되므로 계약일 기준인 국토교통부 실거래가보다 1-2개월 후행할 수 있습니다.
+    신청현황(소유권이전, 매매매수인) 데이터는 일별 날짜 범위로 조회 가능합니다. 파이프라인은 매일 최근 7일치를 수집합니다. 소유현황(현재 누가 소유하고 있는가)은 월별 스냅샷으로만 제공됩니다. KOSIS 국적별 통계는 반기(6개월)마다 공표됩니다. 등기완료 기준으로 집계되므로 계약일 기준인 국토교통부 실거래가보다 1-2개월 후행할 수 있습니다.
   </div>
 </div>
 
@@ -153,7 +153,7 @@
       <thead><tr><th>출처</th><th>데이터</th><th>주기</th></tr></thead>
       <tbody>
         <tr><td>국토교통부 실거래가 API</td><td>아파트/연립/단독/오피스텔/토지/상업용 매매 및 전월세</td><td>일별 누적</td></tr>
-        <tr><td>등기정보광장 Open API (6개)</td><td>소유권이전, 소유현황, 매매매수인 (내/외국인, 국적별)</td><td>월별</td></tr>
+        <tr><td>등기정보광장 Open API (6개)</td><td>소유권이전, 매매매수인 (내/외국인, 국적별)</td><td>일별 (신청현황) / 월별 (소유현황)</td></tr>
         <tr><td>한국부동산원 통계 API</td><td>주택가격지수, 전세가율</td><td>주간/월간</td></tr>
         <tr><td>KB부동산 (PublicDataReader)</td><td>KB시세, 매매/전세 가격지수, 유형별 변동률</td><td>주간</td></tr>
         <tr><td>KOSIS 국가통계포털</td><td>외국인 주택/토지 소유 국적별</td><td>반기</td></tr>
